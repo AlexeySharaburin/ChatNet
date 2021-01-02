@@ -11,7 +11,7 @@ public class Client {
     public static void main(String[] args) {
 
         portNumber = readPortNumber();
-        new ClientThread(ip, portNumber);
+        new ClientsPath(ip, portNumber);
 
     }
 

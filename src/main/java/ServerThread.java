@@ -20,58 +20,26 @@ public class ServerThread extends Thread {
     public void run() {
         String name = null;
         String message;
-        try {
+        try { // вход в чат
             name = in.readLine();
-            try (FileWriter writerLog = new FileWriter(Server.nameLog, true)) {
-                writerLog.write(Server.time + " " + name + " вошёл в чат.\n");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            String stringEnter = Server.time + " " + name + " вошёл в чат.";
+            writeMessageEverywhere(stringEnter);
         } catch (IOException e) {
             e.printStackTrace();
         }
         try {
-            while (true) {
+            while (true) { // выход из чата
                 message = in.readLine();
-                if (message.equals("exit")) {
-                    String stringExit = Server.time + " " + name + " покинул чат.\n";
-                    System.out.println(stringExit);
-                    for (ServerThread serverThread : Server.listOfClients) {
-                        if (!serverThread.socket.isClosed()) {
-                            if (!serverThread.equals(this)) {
-                                serverThread.send(stringExit);
-                            }
-                        }
-                    }
-                    try (FileWriter writerLog = new FileWriter(Server.nameLog, true)) {
-                        writerLog.write(stringExit);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                if (message.equals("выход")) {
+                    String stringExit = Server.time + " " + name + " покинул чат.";
+                    writeMessageEverywhere(stringExit);
+                    this.send("выход");
                     this.closeSocket();
                     break;
                 }
-
+                // штатная работа чата
                 String fullMessage = Server.time + " " + name + ": " + message;
-
-                System.out.println(fullMessage);
-
-                Server.archive.addMessage(fullMessage);
-
-                for (ServerThread serverThread : Server.listOfClients) {
-                    if (!serverThread.socket.isClosed()) {
-                        if (!serverThread.equals(this)) {
-                            serverThread.send(fullMessage);
-                        }
-                    }
-                }
-
-                try (FileWriter writerLog = new FileWriter(Server.nameLog, true)) {
-                    writerLog.write(fullMessage + "\n");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
+                writeMessageEverywhere(fullMessage);
             }
         } catch (IOException e) {
             this.closeSocket();
@@ -100,6 +68,27 @@ public class ServerThread extends Thread {
                 }
             }
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void writeMessageEverywhere(String string) {
+
+        System.out.println(string);
+
+        Server.archive.addMessage(string);
+
+        for (ServerThread serverThread : Server.listOfClients) {
+            if (!serverThread.socket.isClosed()) {
+                if (!serverThread.equals(this)) {
+                    serverThread.send(string);
+                }
+            }
+        }
+
+        try (FileWriter writerLog = new FileWriter(Server.nameLog, true)) {
+            writerLog.write(string + "\n");
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
