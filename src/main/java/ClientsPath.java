@@ -13,8 +13,6 @@ public class ClientsPath {
     private String clientName;
     private String address;
     private int port;
-    private Date date = new Date();
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss dd.MM.yyyy");
 
     public ClientsPath(String address, int port) {
         this.address = address;
@@ -101,6 +99,9 @@ public class ClientsPath {
                     clientMessage = inputMessage.readLine();
                     out.write(clientMessage + "\n");
                     out.flush();
+                    if (clientMessage.equals("выход")) {
+                        break;
+                    }
                 } catch (IOException e) {
                     ClientsPath.this.closeSocket();
                     e.printStackTrace();

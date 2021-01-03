@@ -18,8 +18,10 @@ public class ServerThread extends Thread {
 
     @Override
     public void run() {
+
         String name = null;
         String message;
+
         try { // вход в чат
             name = in.readLine();
             String stringEnter = Server.time + " " + name + " вошёл в чат.";
@@ -27,6 +29,7 @@ public class ServerThread extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         try {
             while (true) { // выход из чата
                 message = in.readLine();

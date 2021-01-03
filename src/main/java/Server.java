@@ -13,6 +13,7 @@ public class Server {
     public static String nameLog = "file.log";
 
     public static int portNumber = 23456;
+
     public static ConcurrentLinkedQueue<ServerThread> listOfClients = new ConcurrentLinkedQueue<>();
 
     public static String time = new SimpleDateFormat("HH:mm:ss dd.MM.yyyy").format(new Date());
