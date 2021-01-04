@@ -4,8 +4,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Server {
 
@@ -14,14 +15,16 @@ public class Server {
 
     public static int portNumber = 23456;
 
-    public static ConcurrentLinkedQueue<ServerThread> listOfClients = new ConcurrentLinkedQueue<>();
-
     public static String time = new SimpleDateFormat("HH:mm:ss dd.MM.yyyy").format(new Date());
+
+    public static CopyOnWriteArrayList<ServerThread> listOfClients = new CopyOnWriteArrayList<>();
 
     public static Archive archive = new Archive();
 
+    final public static ConcurrentSkipListSet<String> listOfNames = new ConcurrentSkipListSet<>();
 
     public static void main(String[] args) throws IOException {
+
 
         createFiles();
 
