@@ -21,10 +21,11 @@ public class Server {
 
     public static Archive archive = new Archive();
 
-    final public static ConcurrentSkipListSet<String> listOfNames = new ConcurrentSkipListSet<>();
+    public static ConcurrentSkipListSet<String> listOfNames = new ConcurrentSkipListSet<>();
 
     public static void main(String[] args) throws IOException {
 
+        listOfNames.clear();
 
         createFiles();
 
@@ -32,7 +33,7 @@ public class Server {
 
         System.out.println("Добро пожаловать в ChatNet!");
         try (FileWriter writerLog = new FileWriter(nameLog, true)) {
-            writerLog.write(time + ": Чат начал работу.\n");
+            writerLog.write(time + " Чат начал работу.\n");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -79,8 +80,8 @@ public class Server {
         }
 
         try (FileWriter writerLogs = new FileWriter(nameLog, true)) {
-            writerLogs.write(time + ": " + msgSettings + "\n");
-            writerLogs.write(time + ": " + msgLog + "\n");
+            writerLogs.write(time + " " + msgSettings + "\n");
+            writerLogs.write(time + " " + msgLog + "\n");
         } catch (Exception e) {
             e.printStackTrace();
         }

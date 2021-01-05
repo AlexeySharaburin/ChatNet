@@ -12,7 +12,6 @@ public class ServerThread extends Thread {
         this.socket = socket;
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        Server.archive.sendMessage(out);
         start();
     }
 
@@ -23,14 +22,35 @@ public class ServerThread extends Thread {
         String message;
 
         try { // вход в чат
-            name = in.readLine();
-            String stringEnter = Server.time + " " + name + " вошёл в чат.";
-            writeMessageEverywhere(stringEnter);
+
+            while (true) { // проверка имени пользователя
+
+                name = in.readLine();
+
+                if (Server.listOfNames.add(name)) {
+                    out.write("ОК" + "\n");
+                    out.flush();
+                    break;
+                } else {
+                    out.write("Ошибка!" + "\n");
+                    out.flush();
+                }
+
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        Server.archive.sendMessage(out);
+
+        String stringEnter = Server.time + " " + name + " вошёл в чат.";
+        writeMessageEverywhere(stringEnter);
+
+
         try {
+            out.write(name + ", теперь вы можете начать обмениваться сообщениями " +
+                    "(для выхода из чата наберите 'выход')" + "\n");
+            out.flush();
             while (true) { // выход из чата
                 message = in.readLine();
                 if (message.equals("выход")) {

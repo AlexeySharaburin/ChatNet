@@ -1,9 +1,6 @@
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
 
 public class ClientsPath {
 
@@ -31,33 +28,12 @@ public class ClientsPath {
             inputMessage = new BufferedReader((new InputStreamReader(System.in)));
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            this.getName();
+            GetNameThread getName = new GetNameThread();
+            getName.start();
+            getName.join();
             new ReadMessageThread().start();
             new WriteMessageThread().start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void getName() {
-        try {
-            System.out.println("Добро пожаловать в ChatNet2.0!");
-            while (true) {
-                System.out.print("Введите ваше имя: ");
-                clientName = inputMessage.readLine();
-                if (Server.listOfNames.add(clientName)) {
-                    break;
-                } else {
-                    System.out.println("Уже есть такой пользователь в ChatNet!");
-                }
-            }
-            System.out.println("Список участников чата: " + Server.listOfNames);
-            System.out.printf("%s, вы можете начать обмениваться сообщениями " +
-                    "(для выхода из чата наберите 'выход')\n", clientName);
-            out.write(clientName + "\n");
-            out.flush();
-        } catch (IOException e) {
-            ClientsPath.this.closeSocket();
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -74,8 +50,41 @@ public class ClientsPath {
         }
     }
 
+    // поток получения уникального пользователя
+    private class GetNameThread extends Thread {
+
+        @Override
+        public void run() {
+            try {
+                System.out.println("Добро пожаловать в ChatNet!");
+                String answer;
+
+                while (true) {
+                    System.out.println("Введите ваше имя: ");
+                    clientName = inputMessage.readLine();
+
+                    out.write(clientName + "\n");
+                    out.flush();
+
+                    answer = in.readLine();
+
+                    if (answer.equals("ОК")) {
+                        break;
+                    } else {
+                        System.out.println("Уже есть такой пользователь с таким именем, попробуйте ещё раз!");
+                    }
+
+                }
+            } catch (IOException e) {
+                ClientsPath.this.closeSocket();
+                e.printStackTrace();
+            }
+        }
+    }
+
     // поток чтения сообщений от сервера
     private class ReadMessageThread extends Thread {
+
         @Override
         public void run() {
             String string;
@@ -85,7 +94,6 @@ public class ClientsPath {
                     if (string.equals("выход")) {
                         System.out.printf("%s, вы покинули чат!\n", clientName);
                         System.out.println("Всего хорошего! До новых встреч в ChatNet2.0!");
-                        Server.listOfNames.remove(clientName);
                         ClientsPath.this.closeSocket();
                         break;
                     } else {
@@ -101,11 +109,12 @@ public class ClientsPath {
 
     // поток сообщений с консоли на сервер
     public class WriteMessageThread extends Thread {
+
         @Override
         public void run() {
-            String clientMessage;
             try {
                 while (true) {
+                    String clientMessage;
                     clientMessage = inputMessage.readLine();
                     out.write(clientMessage + "\n");
                     out.flush();
@@ -121,18 +130,5 @@ public class ClientsPath {
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ClientsPath)) return false;
-        ClientsPath that = (ClientsPath) o;
-        return Objects.equals(clientName, that.clientName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(clientName);
-    }
 }
-
 

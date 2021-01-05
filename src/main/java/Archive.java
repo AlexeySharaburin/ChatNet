@@ -10,8 +10,6 @@ public class Archive {
 
     private static int sizeOfMessages = 10;
     private List<String> archive = new ArrayList<>();
-//    final public static ConcurrentSkipListSet<String> listOfNames = new ConcurrentSkipListSet<>();
-
 
     public void addMessage(String message) {
 
@@ -24,20 +22,21 @@ public class Archive {
     }
 
     public void sendMessage(BufferedWriter bufferedWriter) {
-        if (archive.size() > 0) {
-            try {
-                bufferedWriter.write("История сообщений:" + "\n");
+        try {
+            if (archive.size() > 0) {
+
+                bufferedWriter.write("\n*** Архив сообщений чата:" + "\n");
                 for (String message : archive) {
                     bufferedWriter.write(message + "\n");
                 }
-
-                bufferedWriter.write("пока сообщений в архиве больше нет" + "\n");
+                bufferedWriter.write("*** В архиве сообщений больше нет.\n" + "\n");
                 bufferedWriter.flush();
-
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+
     }
 
 }
